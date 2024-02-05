@@ -1,5 +1,5 @@
 let SERVER_NAME = 'snapify-api' //server name
-let PORT = 3000; //chosen server port
+let PORT = 3500; //chosen server port
 let HOST = '127.0.0.1'; //chosen server address (for this project)
 
 //create reference objects for restify and restify-errors
