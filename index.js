@@ -134,7 +134,7 @@ server.post('/register', function(req, res, next){
                     }else{
                         toRegisterUser.save().then((registeredUser)=>{
                             console.log("Successfully Registered User:" + registeredUser);
-                            res.send(201,registeredUser);
+                            res.send(201,"User Successfully Registered");
                             return next();
                         }).catch((registrationError)=>{
                             console.log('An Error occured while registering User: ' + registrationError);
