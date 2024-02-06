@@ -55,10 +55,15 @@ server.use(restify.plugins.fullResponse());
 server.use(restify.plugins.bodyParser());
 
 server.post('/login', function(req, res, next){
+    returnMessage = {
+        success: false,
+        message: ""
+    }
     console.log("Logging In....")
     if (!req.body.email || !req.body.password || req.body.email === undefined || req.body.password === undefined) {
         console.log("Email: " + req.body.email + ", Password: " + req.body.password)
-        res.send(400, "Cannot LEave Fields Empty");
+        returnMessage.message = "Please provide all required fields"
+        res.send(400, returnMessage);
         return next();
     }else{
         console.log("Email: " + req.body.email + ", Password: " + req.body.password)
@@ -69,13 +74,17 @@ server.post('/login', function(req, res, next){
                 //return next();
                 bcrypt.compare(req.body.password, loggingInUser.hash).then(Result=>{
                     if(!Result){
-                        res.send(400, "Password is Incorrect");
+
+                        returnMessage.message = "Password is Incorrect"
+                        res.send(400, returnMessage);
+
                         return next();
                     }else{
                         console.log("Login Successful -> Logged In as:" + loggingInUser.firstName);
                         //res.send(loggingInUser);
 
                         let _user = {
+                            _id: loggingInUser._id,
                             firstName: loggingInUser.firstName,
                             lastName: loggingInUser.lastName,
                             email: loggingInUser.email,
@@ -112,8 +121,14 @@ server.post('/login', function(req, res, next){
 
 server.post('/register', function(req, res, next){
     console.log("Registering New User...")
+    returnMessage = {
+        success: false,
+        message: ""
+    }
+
     if (!req.body.firstName || !req.body.lastName || !req.body.email || !req.body.age || !req.body.password || req.body.gender === undefined || !req.body.address) {
-        res.send(400, 'Please provide all required fields.');
+        returnMessage.message = "Please provide all required fields"
+        res.send(400, returnMessage);
         return next();
     }else{
 
@@ -140,20 +155,20 @@ server.post('/register', function(req, res, next){
         
                 UserModel.findOne({email: req.body.email}).then((foundUser)=>{
                     if(foundUser){
+                        returnMessage.message = "Email Already in Use"
                         console.log("Email Already in Use: " + foundUser.firstName);
-                        res.send(400, "Email Already in Use");
+                        res.send(400,  returnMessage);
                         return next();
                     }else{
                         toRegisterUser.save().then((registeredUser)=>{
                             console.log("Successfully Registered User:" + registeredUser);
 
-                            returnMessage = {
-                                success: true,
-                                message: "User Successfully Registered"
-                            }
+                            returnMessage.success = true
+                            returnMessage.message = "User Successfully Registered"
 
                             res.send(201,returnMessage);
                             return next();
+
                         }).catch((registrationError)=>{
                             console.log('An Error occured while registering User: ' + registrationError);
                             return next(new Error(JSON.stringify("ERROR! " + registrationError.errors)));
@@ -166,7 +181,7 @@ server.post('/register', function(req, res, next){
 
             }).catch((saltError)=>{
                 console.log('An Error occured while trying to register User: ' + saltError);
-                    return next(new Error(JSON.stringify("ERROR! " + saltError)));
+                return next(new Error(JSON.stringify("ERROR! " + saltError)));
             });
         }).catch(hashError=>{
             console.log('An Error occured while trying to register User: ' + hashError);
