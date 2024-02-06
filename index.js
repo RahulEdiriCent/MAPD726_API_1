@@ -75,7 +75,7 @@ server.post('/login', function(req, res, next){
                         console.log("Login Successful -> Logged In as:" + loggingInUser.firstName);
                         //res.send(loggingInUser);
 
-                        let user = ({
+                        let _user = {
                             firstName: loggingInUser.firstName,
                             lastName: loggingInUser.lastName,
                             email: loggingInUser.email,
@@ -83,9 +83,14 @@ server.post('/login', function(req, res, next){
                             gender:loggingInUser.gender,
                             phoneNumber: loggingInUser.phoneNumber,
                             address: loggingInUser.address,
-                        });
+                        };
 
-                        res.send(200, user)
+                        returnMessage = {
+                            success: true,
+                            user: _user
+                        }
+
+                        res.send(200, returnMessage)
                         //token Logic? 
 
                         return next();
@@ -141,7 +146,13 @@ server.post('/register', function(req, res, next){
                     }else{
                         toRegisterUser.save().then((registeredUser)=>{
                             console.log("Successfully Registered User:" + registeredUser);
-                            res.send(201,"User Successfully Registered");
+
+                            returnMessage = {
+                                success: true,
+                                message: "User Successfully Registered"
+                            }
+
+                            res.send(201,returnMessage);
                             return next();
                         }).catch((registrationError)=>{
                             console.log('An Error occured while registering User: ' + registrationError);
