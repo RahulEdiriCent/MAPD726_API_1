@@ -19,17 +19,13 @@ mongodb_weCare.once('open', ()=>{
 });
 
 const userSchema = new mongoose.Schema({
-        userId:{
-            type: String, //chenged to number to allow for auto-increament purposes for the id
-            unique: true
-        },
         firstName: String,
         lastName: String,
-        email: String,
-        // email: { 
-        //     type: String,
-        //     unique: true
-        // },
+        // email: String,
+        email: { 
+            type: String,
+            unique: true
+        },
         age: Number,
         gender: String,
         phoneNumber:String,
@@ -77,8 +73,19 @@ server.post('/login', function(req, res, next){
                         return next();
                     }else{
                         console.log("Login Successful -> Logged In as:" + loggingInUser.firstName);
-                        res.send(loggingInUser);
+                        //res.send(loggingInUser);
 
+                        let user = ({
+                            firstName: loggingInUser.firstName,
+                            lastName: loggingInUser.lastName,
+                            email: loggingInUser.email,
+                            age: loggingInUser.age,
+                            gender:loggingInUser.gender,
+                            phoneNumber: loggingInUser.phoneNumber,
+                            address: loggingInUser.address,
+                        });
+
+                        res.send(200, user)
                         //token Logic? 
 
                         return next();
@@ -114,7 +121,7 @@ server.post('/register', function(req, res, next){
                 console.log("S: " + salt + ", H: " + hash);
 
                 let toRegisterUser = new UserModel({
-                    userId: req.body.userId, //change later to be auto-number
+                    //userId: req.body.userId, //change later to be auto-number
                     firstName: req.body.firstName,
                     lastName: req.body.lastName,
                     email: req.body.email,
