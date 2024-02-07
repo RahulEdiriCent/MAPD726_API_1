@@ -63,7 +63,7 @@ server.post('/login', function(req, res, next){
     if (!req.body.email || !req.body.password || req.body.email === undefined || req.body.password === undefined) {
         console.log("Email: " + req.body.email + ", Password: " + req.body.password)
         returnMessage.message = "Please provide all required fields"
-        res.send(201, returnMessage);
+        res.send(200, returnMessage);
         return next();
     }else{
         console.log("Email: " + req.body.email + ", Password: " + req.body.password)
@@ -76,7 +76,7 @@ server.post('/login', function(req, res, next){
                     if(!Result){
 
                         returnMessage.message = "Password is Incorrect"
-                        res.send(201, returnMessage);
+                        res.send(200, returnMessage);
 
                         return next();
                     }else{
@@ -128,7 +128,7 @@ server.post('/register', function(req, res, next){
 
     if (!req.body.firstName || !req.body.lastName || !req.body.email || !req.body.userType || !req.body.password || req.body.gender === undefined || !req.body.address) {
         returnMessage.message = "Please provide all required fields"
-        res.send(201, returnMessage);
+        res.send(200, returnMessage);
         return next();
     }else{
 
@@ -157,7 +157,7 @@ server.post('/register', function(req, res, next){
                     if(foundUser){
                         returnMessage.message = "Email Already in Use"
                         console.log("Email Already in Use: " + foundUser.firstName);
-                        res.send(201,  returnMessage);
+                        res.send(200,  returnMessage);
                         return next();
                     }else{
                         toRegisterUser.save().then((registeredUser)=>{
