@@ -280,3 +280,43 @@ server.put('/user/:id', function (req,res,next){
         });
     }
 })
+
+server.get('/user/name/:name', function(req,res,next){
+    
+    console.log("Finding User by ID...")
+    returnMessage = {
+        success: false,
+        message: ""
+    }
+
+    UserModel.findOne({firstName: req.params.name}).then((foundUser)=>{
+        if(foundUser){
+            console.log("User Found -> Returning User:" + foundUser.firstName);
+
+            let _user = {
+                _id: foundUser._id,
+                firstName: foundUser.firstName,
+                lastName: foundUser.lastName,
+                email: foundUser.email,
+                userType: foundUser.userType,
+                gender:foundUser.gender,
+                phoneNumber: foundUser.phoneNumber,
+                address: foundUser.address,
+            };
+
+            returnMessage = {
+                success: true,
+                user: _user
+            }
+            res.send(200, returnMessage)
+            return next();
+        }else{
+            returnMessage.message = "User not Found"
+            res.send(200, returnMessage);
+            return next();
+        }
+    }).catch((searchUserError)=>{
+        console.log('An Error occured while trying to find User with ID: ' + searchUserError);
+        return next(new Error(JSON.stringify("ERROR! " + searchUserError)));
+    })
+})
