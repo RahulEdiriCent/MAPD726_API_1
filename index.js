@@ -264,19 +264,52 @@ server.put('/user/:id', function (req,res,next){
             return next();
 
     }else{
-        UserModel.findOneAndUpdate({_id: req.params.id}, req.body, {new:true}).then((toUpdateUser)=>{
-            if(toUpdateUser){
-                returnMessage.message = "User Found and Updated"
-                res.send(200, returnMessage);
-                return next();
-            }else{
-                returnMessage.message = "Update Failed: User not Found"
-                res.send(200, returnMessage);
-                return next();
-            }
-        }).catch((updateError)=>{
-            console.log("An Error occurred while trying to update User" + updateError);
-            return next(new Error(JSON.stringify("ERROR! " + updateError.errors)))
+
+        var salt = ""; 
+        var hash = ""; //bcrypt.hash(password, salt);
+        bcrypt.genSalt(10).then(_salt =>{
+            salt = _salt;
+            bcrypt.hash(req.body.password, salt).then(_hash =>{
+                hash = _hash;
+                console.log("S: " + salt + ", H: " + hash);
+
+                let toEditUser = new UserModel({
+                    //userId: req.body.userId, //change later to be auto-number
+                    firstName: req.body.firstName,
+                    lastName: req.body.lastName,
+                    email: req.body.email,
+                    gender:req.body.gender,
+                    phoneNumber: req.body.phoneNumber,
+                    address: req.body.address,
+                    userType: req.body.userType,
+                    salt: salt,
+                    hash: hash,
+                });
+
+                UserModel.findOneAndUpdate({_id: req.params.id}, toEditUser, {new:true}).then((toUpdateUser)=>{
+                    if(toUpdateUser){
+                        returnMessage.message = "User Found and Updated"
+                        res.send(200, returnMessage);
+                        return next();
+                    }else{
+                        returnMessage.message = "Update Failed: User not Found"
+                        res.send(200, returnMessage);
+                        return next();
+                    }
+
+                }).catch((updateError)=>{
+                    console.log("An Error occurred while trying to update User" + updateError);
+                    return next(new Error(JSON.stringify("ERROR! " + updateError.errors)))
+                });
+
+            }).catch((saltError)=>{
+                console.log('An Error occured while trying to update User: ' + saltError);
+                return next(new Error(JSON.stringify("ERROR! " + saltError)));
+            });
+
+        }).catch(hashError=>{
+            console.log('An Error occured while trying to update User: ' + hashError);
+            return next(new Error(JSON.stringify("ERROR! " + hashError)));
         });
     }
 })
