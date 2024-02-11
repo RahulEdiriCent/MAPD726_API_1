@@ -273,7 +273,7 @@ server.put('/user/:id', function (req,res,next){
                 hash = _hash;
                 console.log("S: " + salt + ", H: " + hash);
 
-                let toEditUser = new UserModel({
+                let toEditUser = {
                     //userId: req.body.userId, //change later to be auto-number
                     firstName: req.body.firstName,
                     lastName: req.body.lastName,
@@ -284,13 +284,13 @@ server.put('/user/:id', function (req,res,next){
                     userType: req.body.userType,
                     salt: salt,
                     hash: hash,
-                });
+                };
 
                 UserModel.findOneAndUpdate({_id: req.params.id}, toEditUser, {new:true}).then((toUpdateUser)=>{
                     if(toUpdateUser){
                         returnMessage.message = "User Found and Updated"
                         returnMessage.success = true
-                        res.send(200, toUpdateUser);
+                        res.send(200, returnMessage);
                         return next();
                     }else{
                         returnMessage.message = "Update Failed: User not Found"
