@@ -126,10 +126,19 @@ server.post('/register', function(req, res, next){
         message: ""
     }
 
-    if (!req.body.firstName || !req.body.lastName || !req.body.email || !req.body.userType || !req.body.password || req.body.gender === undefined || !req.body.address) {
-        returnMessage.message = "Please provide all required fields"
-        res.send(200, returnMessage);
-        return next();
+    if (!req.body.firstName || 
+        !req.body.lastName || 
+        !req.body.email || 
+        !req.body.userType || 
+        !req.body.password || 
+        req.body.gender === undefined || 
+        !req.body.address || 
+        !req.body.userType) {
+
+            returnMessage.message = "Please provide all required fields"
+            res.send(200, returnMessage);
+            return next();
+
     }else{
 
         var salt = ""; 
@@ -189,4 +198,85 @@ server.post('/register', function(req, res, next){
         });
         
     }     
+})
+
+server.get('user/:id', function(req,res,next){
+    
+    console.log("Finding User by ID...")
+    returnMessage = {
+        success: false,
+        message: ""
+    }
+
+    UserModel.findOne({_id: req.params.id}).then((foundUser)=>{
+        if(foundUser){
+            console.log("User Found -> Returning User:" + foundUser.firstName);
+
+            let _user = {
+                _id: foundUser._id,
+                firstName: foundUser.firstName,
+                lastName: foundUser.lastName,
+                email: foundUser.email,
+                userType: foundUser.userType,
+                gender:foundUser.gender,
+                phoneNumber: foundUser.phoneNumber,
+                address: foundUser.address,
+            };
+
+            returnMessage = {
+                success: true,
+                user: _user
+            }
+            res.send(200, returnMessage)
+            return next();
+        }else{
+            returnMessage.message = "User not Found"
+            res.send(200, returnMessage);
+            return next();
+        }
+    }).catch((searchUserError)=>{
+        console.log('An Error occured while trying to find User with ID: ' + searchUserError);
+        return next(new Error(JSON.stringify("ERROR! " + searchUserError)));
+    })
+})
+
+server.put('/user/:id', function (req,res,next){
+    
+    console.log("Updating User....")
+    returnMessage = {
+            success: false,
+            message: ""
+    }
+
+    
+    if (!req.body.firstName || 
+        !req.body.lastName || 
+        !req.body.email || 
+        !req.body.userType || 
+        !req.body.password || 
+        req.body.gender === undefined || 
+        !req.body.address || 
+        !req.body.userType) {
+
+            //console.log("Email: " + req.body.email + ", Password: " + req.body.password)
+            returnMessage.message = "Please provide all required fields"
+            res.send(200, returnMessage);
+            return next();
+
+    }else{
+        UserModel.findOneAndUpdate({_id: req.params.id}, req.body, {new:true}).then((toUpdateUser)=>{
+            if(toUpdateUser){
+                returnMessage.message = "User Found and Updated"
+                res.send(200, returnMessage);
+                return next();
+            }else{
+                returnMessage.message = "Update Failed: User not Found"
+                res.send(200, returnMessage);
+                return next();
+            }
+        }).catch((updateError)=>{
+            console.log("An Error occurred while trying to update User" + updateError);
+            return next(new Error(JSON.stringify("ERROR! " + updateError.errors)))
+        });
+    }
 })
