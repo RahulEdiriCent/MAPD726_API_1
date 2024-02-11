@@ -200,7 +200,7 @@ server.post('/register', function(req, res, next){
     }     
 })
 
-server.get('user/:id', function(req,res,next){
+server.get('/user/:id', function(req,res,next){
     
     console.log("Finding User by ID...")
     returnMessage = {
