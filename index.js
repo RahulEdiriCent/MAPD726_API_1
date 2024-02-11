@@ -289,7 +289,8 @@ server.put('/user/:id', function (req,res,next){
                 UserModel.findOneAndUpdate({_id: req.params.id}, toEditUser, {new:true}).then((toUpdateUser)=>{
                     if(toUpdateUser){
                         returnMessage.message = "User Found and Updated"
-                        res.send(200, returnMessage);
+                        returnMessage.success = true
+                        res.send(200, toUpdateUser);
                         return next();
                     }else{
                         returnMessage.message = "Update Failed: User not Found"
@@ -341,7 +342,7 @@ server.get('/user/name/:name', function(req,res,next){
                 success: true,
                 user: _user
             }
-            res.send(200, returnMessage)
+            res.send(200, foundUser)
             return next();
         }else{
             returnMessage.message = "User not Found"
