@@ -253,7 +253,7 @@ server.put('/user/:id', function (req,res,next){
         !req.body.lastName || 
         !req.body.email || 
         !req.body.userType || 
-        !req.body.password || 
+        //!req.body.password || 
         req.body.gender === undefined || 
         !req.body.address || 
         !req.body.userType) {
@@ -265,13 +265,13 @@ server.put('/user/:id', function (req,res,next){
 
     }else{
 
-        var salt = ""; 
-        var hash = ""; //bcrypt.hash(password, salt);
-        bcrypt.genSalt(10).then(_salt =>{
-            salt = _salt;
-            bcrypt.hash(req.body.password, salt).then(_hash =>{
-                hash = _hash;
-                console.log("S: " + salt + ", H: " + hash);
+        // var salt = ""; 
+        // var hash = ""; //bcrypt.hash(password, salt);
+        // bcrypt.genSalt(10).then(_salt =>{
+        //     salt = _salt;
+        //     bcrypt.hash(req.body.password, salt).then(_hash =>{
+        //         hash = _hash;
+        //         console.log("S: " + salt + ", H: " + hash);
 
                 let toEditUser = {
                     //userId: req.body.userId, //change later to be auto-number
@@ -282,8 +282,8 @@ server.put('/user/:id', function (req,res,next){
                     phoneNumber: req.body.phoneNumber,
                     address: req.body.address,
                     userType: req.body.userType,
-                    salt: salt,
-                    hash: hash,
+                    // salt: salt,
+                    // hash: hash,
                 };
 
                 UserModel.findOneAndUpdate({_id: req.params.id}, toEditUser, {new:true}).then((toUpdateUser)=>{
@@ -303,15 +303,15 @@ server.put('/user/:id', function (req,res,next){
                     return next(new Error(JSON.stringify("ERROR! " + updateError.errors)))
                 });
 
-            }).catch((saltError)=>{
-                console.log('An Error occured while trying to update User: ' + saltError);
-                return next(new Error(JSON.stringify("ERROR! " + saltError)));
-            });
+        //     }).catch((saltError)=>{
+        //         console.log('An Error occured while trying to update User: ' + saltError);
+        //         return next(new Error(JSON.stringify("ERROR! " + saltError)));
+        //     });
 
-        }).catch(hashError=>{
-            console.log('An Error occured while trying to update User: ' + hashError);
-            return next(new Error(JSON.stringify("ERROR! " + hashError)));
-        });
+        // }).catch(hashError=>{
+        //     console.log('An Error occured while trying to update User: ' + hashError);
+        //     return next(new Error(JSON.stringify("ERROR! " + hashError)));
+        // });
     }
 })
 
