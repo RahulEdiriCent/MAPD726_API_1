@@ -372,6 +372,121 @@ server.get('/user/name/:name', function(req,res,next){//GET USER BY NAME
 
 //===========================PRODUCTS==================================
 
+server.put('/products/:id', function(req,res,next){//ADD PRODUCT
+    
+    console.log("Adding Product....")
+    returnMessage = {
+            success: false,
+            message: ""
+    }
+
+    
+    if (!req.body.productName || 
+        !req.body.brandName || 
+        !req.body.price || 
+        !req.body.shoeType || 
+        !req.body.details || 
+        req.body.imagesArray === undefined || 
+        req.body.sizeArray === undefined || 
+        !req.body.shoeSizeText) {            
+            returnMessage.message = "Please provide all required fields "
+            res.send(200, returnMessage);
+            return next();
+
+    }else{
+
+        let toAddProduct = new ProductModel({
+            productName: req.body.productName, 
+            brandName: req.body.brandName, 
+            shoeType: req.body.shoeType,
+            price: req.body.price, 
+            details: req.body.details,
+            imagesArray: req.body.imagesArray, 
+            sizeArray: req.body.sizeArray, 
+            shoeSizeText: req.body.shoeSizeText,
+        });
+
+        ProductModel.findOne({productName: req.body.productName}).then((foundProduct)=>{
+            if(foundProduct){
+                returnMessage.message = "Product Name Already in Use"
+                console.log("Product Name Already in Use: " + foundProduct.productName);
+                res.send(200,  returnMessage);
+                return next();
+            }else{
+                toAddProduct.save().then((addedProduct)=>{
+                    console.log("Successfully Added Product:" + addedProduct);
+
+                    returnMessage.success = true
+                    returnMessage.message = "Product Successfully Added"
+
+                    res.send(200,returnMessage);
+                    return next();
+
+                }).catch((addProductError)=>{
+                    console.log('An Error occured while added Product: ' + addProductError);
+                    return next(new Error(JSON.stringify("ERROR! " + addProductError.errors)));
+                });
+            }
+        }).catch((findingProductError)=>{
+            console.log('An Error occured while trying to add Product User: ' + findingProductError);
+            return next(new Error(JSON.stringify("ERROR! " + findingProductError.errors)));
+        });
+    }
+})
+
+
+server.put('/products/:id', function(req,res,next){//UPDATE PRODUCT
+    
+    console.log("Updating Product....")
+    returnMessage = {
+            success: false,
+            message: ""
+    }
+
+    
+    if (!req.body.productName || 
+        !req.body.brandName || 
+        !req.body.price || 
+        !req.body.shoeType || 
+        !req.body.details || 
+        req.body.imagesArray === undefined || 
+        req.body.sizeArray === undefined || 
+        !req.body.shoeSizeText) {            
+            returnMessage.message = "Please provide all required fields "
+            res.send(200, returnMessage);
+            return next();
+
+    }else{
+
+        let toEditProduct = {
+            productName: req.body.productName, 
+            brandName: req.body.brandName, 
+            shoeType: req.body.shoeType,
+            price: req.body.price, 
+            details: req.body.details,
+            imagesArray: req.body.imagesArray, 
+            sizeArray: req.body.sizeArray, 
+            shoeSizeText: req.body.shoeSizeText,
+        };
+
+                ProductModel.findOneAndUpdate({_id: req.params.id}, toEditProduct, {new:true}).then((toUpdateProduct)=>{
+                    if(toUpdateProduct){
+                        returnMessage.message = "Product Found and Updated"
+                        returnMessage.success = true
+                        res.send(200, returnMessage);
+                        return next();
+                    }else{
+                        returnMessage.message = "Update Failed: Product not Found"
+                        res.send(200, returnMessage);
+                        return next();
+                    }
+
+                }).catch((updateProductError)=>{
+                    console.log("An Error occurred while trying to update Product" + updateProductError);
+                    return next(new Error(JSON.stringify("ERROR! " + updateProductError.errors)))
+                });
+    }
+})
 
 server.get('/products/brand/:brand', function(req,res,next){//FIND PRODUCTS BY CATEGORY
     
