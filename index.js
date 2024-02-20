@@ -372,6 +372,82 @@ server.get('/user/name/:name', function(req,res,next){//GET USER BY NAME
 
 //===========================PRODUCTS==================================
 
+server.get('/products/brand/:brand', function(req,res,next){//FIND PRODUCTS BY CATEGORY
+    
+    console.log("Finding Product by Brand/Category...")
+    returnMessage = {
+        success: false,
+        message: ""
+    }
+ 
+    if (!req.params.brand || req.params.brand == "") {            
+            returnMessage.message = "Please provide category"
+            res.send(200, returnMessage);
+            return next();
+
+    }else{
+        ProductModel.find({brandName: req.params.brand}).then((filteredProducts)=>{
+            if(filteredProducts){
+                console.log("Products Found -> Returning Products");
+                returnMessage = {
+                    success: true,
+                    products: filteredProducts
+                }
+                res.send(200, returnMessage)
+                return next();
+            }else{
+                returnMessage.message = "No Products Found For Brand/Category"
+                res.send(200, returnMessage);
+                return next();
+            }
+        }).catch((searchProductsError)=>{
+            console.log('An Error occured while trying to find Product with ID: ' + searchProductsError);
+            return next(new Error(JSON.stringify("ERROR! " + searchProductsError)));
+        })
+    }
+})
+
+server.get('/products/:id', function(req,res,next){//GET PRODUCT BY ID
+    
+    console.log("Finding Product by ID...")
+    returnMessage = {
+        success: false,
+        message: ""
+    }
+
+    ProductModel.findOne({_id: req.params.id}).then((foundProduct)=>{
+        if(foundProduct){
+            console.log("Product Found -> Returning Product:" + foundProduct.productName);
+
+            let _product = {
+                _id: foundProduct._id,
+                productName: foundProduct.productName,
+                brandName: foundProduct.brandName,
+                shoeType: foundProduct.shoeType,
+                price: foundProduct.price,
+                details: foundProduct.details,
+                imagesArray: foundProduct.imagesArray,
+                sizeArray: foundProduct.sizeArray,
+                shoeColor: foundProduct.shoeColor,
+                shoeSizeText: foundProduct.shoeSizeText,
+            };
+
+            returnMessage = {
+                success: true,
+                product: _product
+            }
+            res.send(200, returnMessage)
+            return next();
+        }else{
+            returnMessage.message = "Product not Found"
+            res.send(200, returnMessage);
+            return next();
+        }
+    }).catch((searchProductError)=>{
+        console.log('An Error occured while trying to find Product with ID: ' + searchProductError);
+        return next(new Error(JSON.stringify("ERROR! " + searchProductError)));
+    })
+})
 server.post('/products', function(req,res,next){//ADD PRODUCT
     
     console.log("Adding Product....")
@@ -388,6 +464,7 @@ server.post('/products', function(req,res,next){//ADD PRODUCT
         !req.body.details || 
         req.body.imagesArray === undefined || 
         req.body.sizeArray === undefined || 
+        !req.body.shoeColor ||
         !req.body.shoeSizeText) {            
             returnMessage.message = "Please provide all required fields "
             res.send(200, returnMessage);
@@ -402,7 +479,8 @@ server.post('/products', function(req,res,next){//ADD PRODUCT
             price: req.body.price, 
             details: req.body.details,
             imagesArray: req.body.imagesArray, 
-            sizeArray: req.body.sizeArray, 
+            sizeArray: req.body.sizeArray,
+            shoeColor: req.body.shoeColor,
             shoeSizeText: req.body.shoeSizeText,
         });
 
@@ -451,6 +529,7 @@ server.put('/products/:id', function(req,res,next){//UPDATE PRODUCT
         !req.body.details || 
         req.body.imagesArray === undefined || 
         req.body.sizeArray === undefined || 
+        !req.body.shoeColor ||
         !req.body.shoeSizeText) {            
             returnMessage.message = "Please provide all required fields "
             res.send(200, returnMessage);
@@ -466,6 +545,7 @@ server.put('/products/:id', function(req,res,next){//UPDATE PRODUCT
             details: req.body.details,
             imagesArray: req.body.imagesArray, 
             sizeArray: req.body.sizeArray, 
+            shoeColor: req.body.shoeColor,
             shoeSizeText: req.body.shoeSizeText,
         };
 
@@ -486,80 +566,4 @@ server.put('/products/:id', function(req,res,next){//UPDATE PRODUCT
                     return next(new Error(JSON.stringify("ERROR! " + updateProductError.errors)))
                 });
     }
-})
-
-server.get('/products/brand/:brand', function(req,res,next){//FIND PRODUCTS BY CATEGORY
-    
-    console.log("Finding Product by Brand/Category...")
-    returnMessage = {
-        success: false,
-        message: ""
-    }
- 
-    if (!req.params.brand) {            
-            returnMessage.message = "Please provide required field"
-            res.send(200, returnMessage);
-            return next();
-
-    }else{
-        ProductModel.find({brandName: req.params.brand}).then((filteredProducts)=>{
-            if(filteredProducts){
-                console.log("Products Found -> Returning Products");
-                returnMessage = {
-                    success: true,
-                    products: filteredProducts
-                }
-                res.send(200, returnMessage)
-                return next();
-            }else{
-                returnMessage.message = "No Products Found For Brand/Category"
-                res.send(200, returnMessage);
-                return next();
-            }
-        }).catch((searchProductsError)=>{
-            console.log('An Error occured while trying to find Product with ID: ' + searchProductsError);
-            return next(new Error(JSON.stringify("ERROR! " + searchProductsError)));
-        })
-    }
-})
-
-server.get('/products/:id', function(req,res,next){//GET PRODUCT BY ID
-    
-    console.log("Finding Product by ID...")
-    returnMessage = {
-        success: false,
-        message: ""
-    }
-
-    ProductModel.find({_id: req.params.id}).then((foundProduct)=>{
-        if(foundProduct){
-            console.log("Product Found -> Returning Product:" + foundProduct.productName);
-
-            let _product = {
-                _id: foundProduct._id,
-                productName: foundProduct.productName,
-                brandName: foundProduct.brandName,
-                shoeType: foundProduct.shoeType,
-                price: foundProduct.price,
-                details: foundProduct.details,
-                imagesArray: foundProduct.imagesArray,
-                sizeArray: foundProduct.sizeArray,
-                shoeSizeText: foundProduct.shoeSizeText,
-            };
-
-            returnMessage = {
-                success: true,
-                user: _product
-            }
-            res.send(200, returnMessage)
-            return next();
-        }else{
-            returnMessage.message = "Product not Found"
-            res.send(200, returnMessage);
-            return next();
-        }
-    }).catch((searchProductError)=>{
-        console.log('An Error occured while trying to find Product with ID: ' + searchProductError);
-        return next(new Error(JSON.stringify("ERROR! " + searchProductError)));
-    })
 })
