@@ -45,6 +45,7 @@ const productSchema = new mongoose.Schema({
     details: String,
     imagesArray: [String],
     sizeArray: [Number],
+    shoeColor: String,
     shoeSizeText: String,
 });
 
