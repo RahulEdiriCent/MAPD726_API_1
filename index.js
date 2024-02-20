@@ -372,7 +372,7 @@ server.get('/user/name/:name', function(req,res,next){//GET USER BY NAME
 
 //===========================PRODUCTS==================================
 
-server.put('/products/:id', function(req,res,next){//ADD PRODUCT
+server.post('/products/:id', function(req,res,next){//ADD PRODUCT
     
     console.log("Adding Product....")
     returnMessage = {
