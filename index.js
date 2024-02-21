@@ -44,7 +44,7 @@ const productSchema = new mongoose.Schema({
     price: Number,
     details: String,
     imagesArray: [String],
-    sizeArray: [Number],
+    sizeArray: [mongoose.Schema.Types.Double],//[Number],
     shoeColor: String,
     shoeSizeText: String,
 });
