@@ -44,7 +44,7 @@ const productSchema = new mongoose.Schema({
     price: Number,
     details: String,
     imagesArray: [String],
-    sizeArray: [mongoose.Schema.Types.Double],//[Number],
+    sizeArray: [Number],//[Number],
     shoeColor: String,
     shoeSizeText: String,
 });
@@ -419,6 +419,12 @@ server.get('/products/:id', function(req,res,next){//GET PRODUCT BY ID
     ProductModel.findOne({_id: req.params.id}).then((foundProduct)=>{
         if(foundProduct){
             console.log("Product Found -> Returning Product:" + foundProduct.productName);
+            
+            const doubleSizeArray = foundProduct.sizeArray.map(sizeValue => {
+                return { ...sizeValue._doc,
+                    sizeArray: sizeValue.sizeArray.map(size => size.toFixed(1)) // Format each size to 1 decimal point
+                };
+            });
 
             let _product = {
                 _id: foundProduct._id,
@@ -428,7 +434,7 @@ server.get('/products/:id', function(req,res,next){//GET PRODUCT BY ID
                 price: foundProduct.price,
                 details: foundProduct.details,
                 imagesArray: foundProduct.imagesArray,
-                sizeArray: foundProduct.sizeArray,
+                sizeArray: doubleSizeArray,//foundProduct.sizeArray,
                 shoeColor: foundProduct.shoeColor,
                 shoeSizeText: foundProduct.shoeSizeText,
             };
