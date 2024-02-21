@@ -420,7 +420,7 @@ server.get('/products/:id', function(req,res,next){//GET PRODUCT BY ID
         if(foundProduct){
             console.log("Product Found -> Returning Product:" + foundProduct.productName);
             
-            const doubleSizeArray = foundProduct.sizeArray.map(size => size.toFixed(1)) // Format each size to 1 decimal point
+            let doubleSizeArray = foundProduct.sizeArray.map(size => size.toFixed(1)) // Format each size to 1 decimal point
 
 
             let _product = {
@@ -475,7 +475,7 @@ server.post('/products', function(req,res,next){//ADD PRODUCT
             return next();
 
     }else{
-
+        const doubleSizeArray = req.body.sizeArray.map(size => size.toFixed(1))
         let toAddProduct = new ProductModel({
             productName: req.body.productName, 
             brandName: req.body.brandName, 
@@ -483,7 +483,7 @@ server.post('/products', function(req,res,next){//ADD PRODUCT
             price: req.body.price, 
             details: req.body.details,
             imagesArray: req.body.imagesArray, 
-            sizeArray: req.body.sizeArray,
+            sizeArray: doubleSizeArray,//req.body.sizeArray,
             shoeColor: req.body.shoeColor,
             shoeSizeText: req.body.shoeSizeText,
         });
