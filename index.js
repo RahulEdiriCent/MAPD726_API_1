@@ -420,9 +420,7 @@ server.get('/products/:id', function(req,res,next){//GET PRODUCT BY ID
         if(foundProduct){
             console.log("Product Found -> Returning Product:" + foundProduct.productName);
             
-            let doubleSizeArray = foundProduct.sizeArray.map(size => size.toFixed(1)) // Format each size to 1 decimal point
-
-
+            let doubleSizeArray = foundProduct.sizeArray.map(size => size.toFixed(1)) // set it to Double formatting
             let _product = {
                 _id: foundProduct._id,
                 productName: foundProduct.productName,
@@ -475,7 +473,7 @@ server.post('/products', function(req,res,next){//ADD PRODUCT
             return next();
 
     }else{
-        const doubleSizeArray = req.body.sizeArray.map(size => size.toFixed(1))
+        let doubleSizeArray = req.body.sizeArray.map(size => size.toFixed(1))
         let toAddProduct = new ProductModel({
             productName: req.body.productName, 
             brandName: req.body.brandName, 
@@ -540,7 +538,7 @@ server.put('/products/:id', function(req,res,next){//UPDATE PRODUCT
             return next();
 
     }else{
-
+        let doubleSizeArray = req.body.sizeArray.map(size => size.toFixed(1))
         let toEditProduct = {
             productName: req.body.productName, 
             brandName: req.body.brandName, 
@@ -548,7 +546,7 @@ server.put('/products/:id', function(req,res,next){//UPDATE PRODUCT
             price: req.body.price, 
             details: req.body.details,
             imagesArray: req.body.imagesArray, 
-            sizeArray: req.body.sizeArray, 
+            sizeArray: doubleSizeArray, 
             shoeColor: req.body.shoeColor,
             shoeSizeText: req.body.shoeSizeText,
         };
