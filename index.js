@@ -420,11 +420,8 @@ server.get('/products/:id', function(req,res,next){//GET PRODUCT BY ID
         if(foundProduct){
             console.log("Product Found -> Returning Product:" + foundProduct.productName);
             
-            const doubleSizeArray = foundProduct.sizeArray.map(sizeValue => {
-                return { ...sizeValue._doc,
-                    sizeArray: sizeValue.sizeArray.map(size => size.toFixed(1)) // Format each size to 1 decimal point
-                };
-            });
+            const doubleSizeArray = foundProduct.sizeArray.map(size => size.toFixed(1)) // Format each size to 1 decimal point
+
 
             let _product = {
                 _id: foundProduct._id,
